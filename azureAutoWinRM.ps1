@@ -461,3 +461,7 @@ $VM = "ansibletestwin2"
 
 #Runs enableWinRM on VM
 Invoke-AzureRmVmRunCommand -ResourceGroupName $RG -Name $VM -CommandId 'RunPowerShellScript' -ScriptPath 'run.ps1'
+
+
+#For Linux
+#Invoke-AzureRmVMRunCommand -ResourceGroupName $ResourceGroupName -Name $VMName -CommandId 'RunShellScript' -ScriptPath '.\system_setup.sh'
