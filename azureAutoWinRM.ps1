@@ -462,8 +462,24 @@ $VM = "ansibletestwin2"
 #Runs enableWinRM on VM
 Invoke-AzureRmVmRunCommand -ResourceGroupName $RG -Name $VM -CommandId 'RunPowerShellScript' -ScriptPath 'run.ps1'
 
-<#
+#<#
 #For Linux
+
+#====================================================================================================
+# Get IP Address of VM
+#====================================================================================================
+$report = @()
+$vms = $VM
+$nics = get-azurermnetworkinterface | ?{ $_.VirtualMachine -NE $null}
+    $info = "" | Select VmName, ResourceGroupName, HostName, IpAddress
+    $vm = $vms | ? -Property Id -eq $nic.VirtualMachine.id
+    $info.VMName = $vm.Name
+    $info.ResourceGroupName = $vm.ResourceGroupName
+    $info.IpAddress = $nic.IpConfigurations.PrivateIpAddress
+    $info.HostName = $vm.OSProfile.ComputerName
+    $report+=$info
+$IP = ($report.IpAddress)
+
 
 $runAnsable = {
 #!/bin/bash
