@@ -481,13 +481,13 @@ $nics = get-azurermnetworkinterface | ?{ $_.VirtualMachine -NE $null}
 $IP = ($report.IpAddress)
 
 
-$runAnsable = {
+$runAnsable = ("
 #!/bin/bash
 
 cd /home/shawn/a/ansible-alliance-master/SCTM-DFO-IaaS/
 
-ansible-playbook -i 10.25.0.4, Windows_ULL.yml -v -e private_ip=10.25.0.4 -e target=all -e ansible_connection=winrm -e ansible_user=crcadmin -e ansible_password=8dN3n2%bD73Z483!nbSg -e ansible_winrm_transport=ssl
-}
+ansible-playbook -i " + $IP + ", Windows_ULL.yml -v -e private_ip=" + $IP +" -e target=all -e ansible_connection=winrm -e ansible_user=crcadmin -e ansible_password=8dN3n2%bD73Z483!nbSg -e ansible_winrm_transport=ssl"
+)
 
 $runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.ps1
 
@@ -495,3 +495,4 @@ $runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.ps1
 Invoke-AzureRmVMRunCommand -ResourceGroupName "crc-msdn-itim" -Name "awx-ansible" -CommandId 'RunShellScript' -ScriptPath '.\runAnsable.sh'
 
 #>
+
