@@ -32,6 +32,12 @@ catch {
     }
 }
 #====================================================================================================
+#                 Check if system has required module, and if not install the module
+#====================================================================================================
+if (!(Get-Module -Name AzureRM.Network)) {Write-Output "Install-Module -Name AzureRM.Network -RequiredVersion 6.9.1"}
+
+
+#====================================================================================================
 #                        enableWinRM PowerShell script to be run on VM
 #====================================================================================================
 $enableWinRM = {
@@ -489,7 +495,7 @@ cd /home/shawn/a/ansible-alliance-master/SCTM-DFO-IaaS/
 ansible-playbook -i " + $IP + ", Windows_ULL.yml -v -e private_ip=" + $IP +" -e target=all -e ansible_connection=winrm -e ansible_user=crcadmin -e ansible_password=8dN3n2%bD73Z483!nbSg -e ansible_winrm_transport=ssl"
 )
 
-$runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.sh; cat .\runAnsable.sh #TEST
+$runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.sh; cat .\runAnsable.sh; #TEST
 
 
 Invoke-AzureRmVMRunCommand -ResourceGroupName "crc-msdn-itim" -Name "awx-ansible" -CommandId 'RunShellScript' -ScriptPath '.\runAnsable.sh' #DONT HAVE PERMISSIONS TO RUN COMMAND ON THE RG
