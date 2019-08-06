@@ -470,7 +470,7 @@ Invoke-AzureRmVmRunCommand -ResourceGroupName $RG -Name $VM -CommandId 'RunPower
 #====================================================================================================
 $report = @()
 $vms = $VM
-$nics = get-azurermnetworkinterface | ?{ $_.VirtualMachine -NE $null}
+$nics = get-azurermnetworkinterface | ?{ $_.VirtualMachine -NE $null} #AUTOMATION DOES NOT LIKE
     $info = "" | Select VmName, ResourceGroupName, HostName, IpAddress
     $vm = $vms | ? -Property Id -eq $nic.VirtualMachine.id
     $info.VMName = $vm.Name
@@ -489,10 +489,10 @@ cd /home/shawn/a/ansible-alliance-master/SCTM-DFO-IaaS/
 ansible-playbook -i " + $IP + ", Windows_ULL.yml -v -e private_ip=" + $IP +" -e target=all -e ansible_connection=winrm -e ansible_user=crcadmin -e ansible_password=8dN3n2%bD73Z483!nbSg -e ansible_winrm_transport=ssl"
 )
 
-$runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.ps1
+$runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.sh; cat .\runAnsable.sh #TEST
 
 
-Invoke-AzureRmVMRunCommand -ResourceGroupName "crc-msdn-itim" -Name "awx-ansible" -CommandId 'RunShellScript' -ScriptPath '.\runAnsable.sh'
+Invoke-AzureRmVMRunCommand -ResourceGroupName "crc-msdn-itim" -Name "awx-ansible" -CommandId 'RunShellScript' -ScriptPath '.\runAnsable.sh' #DONT HAVE PERMISSIONS TO RUN COMMAND ON THE RG
 
 #>
 
