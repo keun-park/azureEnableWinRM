@@ -5,6 +5,17 @@
 
 
 #====================================================================================================
+#This is where you specify the VM to run the "enableWinRM" script on
+#This ideally would be passed in from the AWX Runbook when it invokes Azure to run this Runbook
+#These are the only variables required for this Runbook to run
+#If possible the best way would be for the Runbook to take in an argument and AWX to call this passing
+#the arg from the its variables for the current machine it is working on
+$RG = "crc-msdn-itim-coop-devtest"
+$VM = "ansibletestwin2"
+#====================================================================================================
+
+
+#====================================================================================================
 #                                         Connect to Azure
 #====================================================================================================
 $connectionName = "AzureRunAsConnection"
@@ -461,44 +472,6 @@ $enableWinRM | Out-File -Width 4096 -FilePath .\run.ps1
 #====================================================================================================
 #
 #====================================================================================================
-$RG = "crc-msdn-itim-coop-devtest"
-$VM = "ansibletestwin2"
-
 
 #Runs enableWinRM on VM
 Invoke-AzureRmVmRunCommand -ResourceGroupName $RG -Name $VM -CommandId 'RunPowerShellScript' -ScriptPath 'run.ps1'
-
-#<#
-#For Linux
-
-#====================================================================================================
-# Get IP Address of VM
-#====================================================================================================
-$report = @()
-$vms = $VM
-$nics = get-azurermnetworkinterface | ?{ $_.VirtualMachine -NE $null} #AUTOMATION DOES NOT LIKE
-    $info = "" | Select VmName, ResourceGroupName, HostName, IpAddress
-    $vm = $vms | ? -Property Id -eq $nic.VirtualMachine.id
-    $info.VMName = $vm.Name
-    $info.ResourceGroupName = $vm.ResourceGroupName
-    $info.IpAddress = $nic.IpConfigurations.PrivateIpAddress
-    $info.HostName = $vm.OSProfile.ComputerName
-    $report+=$info
-$IP = ($report.IpAddress)
-
-
-$runAnsable = ("
-#!/bin/bash
-
-cd /home/shawn/a/ansible-alliance-master/SCTM-DFO-IaaS/
-
-ansible-playbook -i " + $IP + ", Windows_ULL.yml -v -e private_ip=" + $IP +" -e target=all -e ansible_connection=winrm -e ansible_user=crcadmin -e ansible_password=8dN3n2%bD73Z483!nbSg -e ansible_winrm_transport=ssl"
-)
-
-$runAnsable | Out-File -Width 4096 -FilePath .\runAnsable.sh; cat .\runAnsable.sh; #TEST
-
-
-Invoke-AzureRmVMRunCommand -ResourceGroupName "crc-msdn-itim" -Name "awx-ansible" -CommandId 'RunShellScript' -ScriptPath '.\runAnsable.sh' #DONT HAVE PERMISSIONS TO RUN COMMAND ON THE RG
-
-#>
-
